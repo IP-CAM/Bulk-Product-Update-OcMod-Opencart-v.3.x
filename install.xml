@@ -114,8 +114,6 @@
                     }
                 }
                 $this->session->data['success'] = $this->language->get('text_success') . ' (Total Modified: '.$counter.')';
-                // $this->response->addHeader('Content-Type: application/json');
-                // $this->response->setOutput(json_encode(['success'=> $counter.' Products Modified']));
             }]]></add>
         </operation>
     </file>
@@ -153,8 +151,8 @@
     </file>
     <file path="admin/language/*/catalog/product.php">
         <operation>
-            <search><![CDATA[ $_['heading_title']          = 'Products'; ]]></search>
-            <add position="after"><![CDATA[
+            <search><![CDATA[ $_['heading_title'] ]]></search>
+            <add position="before"><![CDATA[
             //Bulk Product Update Module
                 $_['text_module_bulk_price_loading']                    = 'Processing..';
                 $_['text_module_bulk_price_title']                      = 'Bulk Product Update';
