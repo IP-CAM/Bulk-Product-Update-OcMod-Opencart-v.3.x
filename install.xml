@@ -3,7 +3,7 @@
     <name>Bulk Product Update</name>
     <version>1.0.0</version>
     <author>Sahil Bhatia</author>
-    <link>http://www.webiggle.com</link>
+    <link>https://www.webiggle.com</link>
     <code>bulk_product_update</code>
     <description>Bulk product update</description>
     <file path="admin/view/template/catalog/product_list.twig">
