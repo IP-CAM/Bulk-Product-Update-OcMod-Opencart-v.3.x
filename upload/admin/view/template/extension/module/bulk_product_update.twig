@@ -1,0 +1,512 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+
+    {% if success %}
+      <div class="alert alert-success alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ success }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
+
+    {% if error_products %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_products }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+
+    {% if error_common %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_common }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+
+    <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+      <div class="row">
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title strong"><i class="fa fa-filter"></i> {{ text_filter }}</h3>
+            </div>
+            <div class="panel-body">
+                <div id="filter-product" class="form-horizontal" style="min-height:330px">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label" for="input-category">{{ entry_category }}</label>
+                            <div class="col-sm-8">
+                                <select name="filter_products_by_category" id="input-category" class="form-control">
+                                    <option value=""> {{ entry_category_placeholder }}</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                          <div class="col-sm-12">
+                            <div id="categories_selected" class="form-control" style="height: 200px; overflow-y: auto;">
+                              <span class="no-item-label">No Category Selected.</span>
+                            </div>
+                          </div>
+                        </div>
+                    </div> <!-- col -->
+                </div>
+            </div>
+          </div>
+        </div> <!-- col -->
+      
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title strong"><i class="fa fa-check"></i> {{ text_select_products }} <span class="total_selected_products">0</span></h3>
+            </div>
+            <div class="panel-body">
+                <div id="filtered-products" class="form-horizontal" style="min-height:330px">
+                    <div class="col-sm-12">
+                      <div class="form-group">
+                        <label class="col-sm-4 control-label" for="input-product"><span data-toggle="tooltip" title="{{ help_selected_products }}">{{ entry_selected_products }}</span></label>
+                        <div class="col-sm-8">
+                        <input type="text" name="filter_product" value="" placeholder="{{ entry_selected_products }}" id="input-product" class="form-control"/>
+                        </div>
+                      </div>
+                      
+                      <div class="form-group">
+                        <div class="col-sm-12">
+                          <div id="products_selected" class="well well-sm" style="height: 200px; overflow-y: auto;">
+                            <span class="no-item-label">No Product Selected.</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div> <!-- col --> 
+      </div> <!-- row -->
+
+      <div style="margin-top:10px;margin-bottom:2rem;">
+        <h3 class="strong" style="font-size:21px;">
+          <i class="fa fa-edit" style="margin-right:5px;"></i>{{ text_update }}
+        </h3>
+      </div>
+    
+      <div class="panel panel-default">
+
+            <div class="list-group">
+              <div class="list-group-item" style="display: flex;justify-content: space-between; align-items:center;    background-color: #d9edf7; border:1px solid #bce8f1;">
+                <h4 class="list-group-item-heading"><i class="fa fa-dollar" style="padding-right:7px"></i>{{entry_price}}</h4>
+                <div class="action-block" style="margin-top: -10px;">
+                  <label class="radio-inline">                            
+                    <input type="radio" class="price_change" name="price_change" value="1" checked="checked" style="margin-bottom: -2px;"> Yes
+                  </label>
+                  <label class="radio-inline">                           
+                    <input type="radio" class="price_change" name="price_change" value="0" style="margin-bottom: -2px;"> No
+                  </label>
+                </div>
+              </div> <!-- list group item -->
+
+              <div class="list-group-item">
+
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-price">{{ entry_price_change_by }}
+                  <span data-toggle="tooltip" title="{{ help_price_change_by }}">
+                  </label>
+                  <div class="col-sm-10">
+                    <label class="radio-inline">
+                      {% if price_change_by == 1 %}
+                          <input type="radio" class="price_change_by" name="price_change_by" value="1" style="margin-bottom: -2px;" checked="checked"/> Percenatge
+                      {% elseif not price_change_by %}
+                        <input type="radio" class="price_change_by" name="price_change_by" value="1" style="margin-bottom: -2px;" checked="checked"/> Percenatge
+                      {% else %}
+                        <input type="radio" class="price_change_by" name="price_change_by" value="1" style="margin-bottom: -2px;" /> Percenatge
+                      {% endif %}
+                    </label>
+                    <label class="radio-inline">
+                      {% if price_change_by == 2 %}
+                          <input type="radio" class="price_change_by" name="price_change_by" value="2" style="margin-bottom: -2px;" checked="checked"/> Flat
+                      {% else %}
+                        <input type="radio" class="price_change_by" name="price_change_by" value="2" style="margin-bottom: -2px;"/> Flat
+                      {% endif %}
+                    </label>
+
+                    {% if error_price_change_by %}
+                      <div class="text-danger" style="margin-top:5px; font-weight:bold;">{{error_price_change_by}}</div>
+                    {% endif %}
+                  </div>
+                </div> <!-- form group -->
+
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-price">
+                  {{ entry_price_change_mode }}
+                  <span data-toggle="tooltip" title="{{ help_price_change_mode }}">
+                  </label>
+                  <div class="col-sm-10">
+                    <label class="radio-inline">
+                      {% if price_change_mode == 1 %}
+                        <input type="radio" class="price_change_mode" name="price_change_mode" value="1" style="margin-bottom: -2px;" checked="checked"> Increment (+)
+                      {% elseif not price_change_mode == 1 %}
+                        <input type="radio" class="price_change_mode" name="price_change_mode" value="1" style="margin-bottom: -2px;" checked="checked"> Increment (+)
+                      {% else %}
+                        <input type="radio" class="price_change_mode" name="price_change_mode" value="1" style="margin-bottom: -2px;"> Increment (+)
+                      {% endif %}
+                    </label>
+                    <label class="radio-inline">
+                      {% if price_change_mode == 2 %}
+                        <input type="radio" class="price_change_mode" name="price_change_mode" value="2" style="margin-bottom: -2px;" checked="checked"> Decrement (-)
+                      {% else %}
+                        <input type="radio" class="price_change_mode" name="price_change_mode" value="2" style="margin-bottom: -2px;"> Decrement (-)
+                      {% endif %}
+                    </label>
+                    <label class="radio-inline">
+                      {% if price_change_mode == 3 %}
+                        <input type="radio" class="price_change_mode" name="price_change_mode" value="3" style="margin-bottom: -2px;" checked="checked"> Replace
+                      {% else %}
+                        <input type="radio" class="price_change_mode" name="price_change_mode" value="3" style="margin-bottom: -2px;"> Replace
+                      {% endif %}
+                    </label>
+
+                    {% if error_price_change_mode %}
+                      <div class="text-danger" style="margin-top:5px; font-weight:bold;">{{error_price_change_mode}}</div>
+                    {% endif %}
+                  </div>
+                </div> <!-- form group -->
+
+                <div class="form-group">
+                  <label class="col-sm-2 control-label" for="input-price">
+                  {{ entry_price_change_round_off }}
+                  <span data-toggle="tooltip" title="{{ help_price_change_round_off }}">
+                  </label>
+                   <div class="col-sm-2">
+                      <input  type="text" name="price_change_round_off_value" id="input-price-value" placeholder="{{ entry_price_change_round_off }}" class="form-control" value="{{ price_change_round_off_value }}" readonly>
+                    </div>
+                  <div class="col-sm-3" style="max-width: 250px;">
+                    <label class="radio-inline">
+                      {% if price_change_round_off == 1 %}
+                        <input type="radio" class="price_change_round_off" name="price_change_round_off" value="1" style="margin-bottom: -2px;" checked="checked"> Up (+)
+                      {% else %}
+                        <input type="radio" class="price_change_round_off" name="price_change_round_off" value="1" style="margin-bottom: -2px;"> Up (+)
+                      {% endif %}
+                    </label>
+                    <label class="radio-inline">
+                      {% if price_change_round_off == 2 %}
+                        <input type="radio" class="price_change_round_off" name="price_change_round_off" value="2" style="margin-bottom: -2px;" checked="checked"> Down (-)
+                      {% else %}
+                        <input type="radio" class="price_change_round_off" name="price_change_round_off" value="2" style="margin-bottom: -2px;"> Down (-)
+                      {% endif %}
+                    </label>
+
+                    <label class="radio-inline">
+                      {% if price_change_round_off == 3 %}
+                        <input type="radio" class="price_change_round_off" name="price_change_round_off" value="3" style="margin-bottom: -2px;"> None
+                      {% elseif not price_change_round_off %}
+                        <input type="radio" class="price_change_round_off" name="price_change_round_off" value="3" style="margin-bottom: -2px;" checked="checked"> None
+                      {% else %}
+                        <input type="radio" class="price_change_round_off" name="price_change_round_off" value="3" style="margin-bottom: -2px;"> None
+                      {% endif %}
+                    </label>
+                  </div>
+                  
+                    <div class="col-sm-5">
+                      {% if error_price_change_round_off_value %}
+                        <div class="text-danger" style="margin-top:5px; font-weight:bold;">{{error_price_change_round_off_value}}</div>
+                      {% endif %}
+                    </div>
+                </div> <!-- form group -->
+                                    
+                <div class="form-group">
+                  <div class="">
+                    <label class="col-sm-2 control-label" for="input-price-value">
+                    {{ entry_price_change_value }}
+                    <span data-toggle="tooltip" title="{{ help_price_change_value }}">
+                    </label>
+                    <div class="col-sm-2">
+                      <input  type="text" name="price_change_value" id="input-price-value" placeholder="{{ entry_price_change_value }}" class="form-control" value="{{ price_change_value }}" required>
+                    </div>
+                    <div class="col-sm-8">
+                    {% if error_price_change_value %}
+                      <div class="text-danger" style="margin-top:5px; font-weight:bold;">{{error_price_change_value}}</div>
+                    {% endif %}
+                    </div>
+                  </div>
+
+                  <div class="col-sm-12" style="margin-top:15px;;">
+                    <div class="col-sm-12">
+                      <div class="alert alert-info">
+                        <div class="col-sm-12">
+                          <b><i class="fa fa-info-circle" style="margin-right:5px;"></i>Examples</b> 
+                        </div>
+
+                        <div class="col-sm-12">
+                          <div class="col-sm-4 col-xs-12">
+                            <div style="margin-top:7px">
+                              <b>Case 1: </b>Percentage &amp; Increment with value 5 <br />
+                              <b>Current Price</b> = 100 <br />
+                              <b>Percentage (5%) of 100</b> = 5 <br />
+                              <b>New Price</b> = (100 + 5) = 105 <br />
+                              (Addition because mode is Increment.)<br />
+                              <b>Round Off Up to 10th Value</b> = (105 + 5) = 110 <br />
+                              (5 will be added.)<br />
+                              <b>New price will be</b> = 110
+                            </div>    
+                          </div>
+                          <div class="col-sm-4 col-xs-12">
+                            <div style="margin-top:7px">
+                              <b>Case 3: </b>Flat &amp; Decrement with value 12 <br />
+                              <b>Current Price</b> = 100 <br />
+                              <b>Flat</b> = 12 <br />
+                              <b>New Price</b> = (100 - 12) = 88 <br />
+                              (Subtraction because mode is Decrement.) <br />
+                              <b>Round Off Down to 10th Value</b> = (88 - 8) = 80 <br />
+                              (8 will be subtracted.)<br />
+                              <b>New price will be</b> = 80 
+                            </div>    
+                          </div>
+
+                          <div class="col-sm-4 col-xs-12">
+                            <div style="margin-top:7px">
+                              <b>Case 2: </b>Flat &amp; Replace with value 99 <br />
+                              <b>Current Price</b> = 249 <br />
+                              <b>Flat</b> = 99 <br />
+                              <b>New Price</b> = 99 <br />
+                              (Replace will change all price with value given.)
+                            </div>    
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div> <!-- form group -->
+
+              </div> <!-- list group item -->
+
+            </div> <!-- list group -->
+        
+      </div> <!-- form horizonatal -->
+
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <div class="submit-block" style="min-height:80px; text-align:center;margin-top:15px;">
+            <div class="text-danger" style="margin-bottom:10px;font-weight:bold;">
+              Note: <span class="total_selected_products">0</span> will be updated
+            </div>
+            <button type="submit" class="btn btn-danger" form="" style="width:200px; font-size:17px;" >
+            BULK UPDATE
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+
+    let selectedProducts = [];
+    let selectedCategories = [];
+
+    $('.action-block input').on('change', function(){
+      var element = $(this).closest('.list-group-item').next();
+
+      if($(this).val() == 0){
+        element.slideUp();
+        return;
+      }
+
+      element.slideDown();
+    });
+    // Filter by category
+    $('select[name=\'filter_products_by_category\']').on('change', function(){
+      var category_id = parseInt($(this).val());
+      var category_name = $(this).find(':selected').text();
+        $.ajax({
+            url: 'index.php?route=extension/module/bulk_product_update/filterProducts&user_token={{ user_token }}&filter_category_id=' + category_id,
+            dataType: 'json',
+            success: function(data) {
+              var totalProducts = data.length;
+
+                data.forEach(function(item){
+                    var id = parseInt(item['product_id']);
+
+                    if(! isProductSelected(id)){
+
+                        selectedProducts.push({
+                          category_id: category_id,
+                          product_id: id,
+                        });
+
+                        $('#products_selected').append('<div id="products' + id + '" data-id="'+ id +'" data-category-id="'+category_id+'" class="item"><i class="fa fa-minus-circle text-danger"></i> ' + item['name'] + '<input type="hidden" name="products[]" value="' + id + '" /></div>');
+                    }
+                });
+
+              console.log(selectedProducts);
+
+              if(selectedCategories.indexOf(category_id) < 0){
+                  selectedCategories.push(category_id);
+                  $('#categories_selected').append('<div class="btn btn-default item" data-id="' +category_id + '" style="margin:5px;"><div class="icon"><i class="fa fa-times text-danger"></i> ' + category_name + ' <span class="badge">'+totalProducts+'</span></div></div>');
+              }
+
+              setNoItemLabels();
+              setCounts();
+            }
+        });
+    });
+
+    // Filter by product name
+    $('input[name=\'filter_product\']').autocomplete({
+      'source': function(request, response) {
+        $.ajax({
+          url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+          dataType: 'json',
+          success: function(json) {
+            response($.map(json, function(item) {
+              return {
+                label: item['name'],
+                value: item['product_id']
+              }
+            }));
+          }
+        });
+      },
+      'select': function(item) {
+        $('input[name=\'filter_product\']').val('');
+
+        item['value'] = parseInt(item['value']);
+
+        if(! isProductSelected(item['value'])){
+            selectedProducts.push({
+              category_id: null,
+              product_id: item['value'],
+            });
+
+            $('#products_selected').append('<div id="products' + item['value'] + '" data-id="'+ item['value'] +'" data-category-id="'+null+'" class="item"><i class="fa fa-minus-circle text-danger"></i> ' + item['label'] + '<input type="hidden" name="products[]" value="' + item['value'] + '" /></div>');
+        }
+
+        setNoItemLabels();
+        setCounts();
+      }
+    });
+
+    $('#categories_selected').delegate('.item', 'click', function(){
+      var id = $(this).data('id');
+
+      $(this).remove();
+
+      selectedCategories = selectedCategories.filter((item) => item != id);
+
+      $('#products_selected').find('.item').each(function(){
+        if($(this).data('category-id') == id) {
+          $(this).remove()
+        }
+      });
+
+      selectedProducts = selectedProducts.filter((item) => item.category_id != id)
+
+      setCounts();
+      setNoItemLabels();
+    });
+
+
+    $('#products_selected').delegate('.fa-minus-circle', 'click', function() {
+        var id = $(this).parent().data('id');
+        var category_id = $(this).parent().data('category-id');
+
+        $(this).parent().remove();
+
+        selectedProducts = selectedProducts.filter((item) => item.product_id != id);
+        
+        
+        $('#categories_selected').find('.item').each(function(){
+          if($(this).data('id') == category_id) {
+            $(this).remove()
+          }
+        });
+
+        selectedCategories = selectedCategories.filter((item) => item != category_id);
+
+        setCounts();
+        setNoItemLabels();
+    });
+
+    function isProductSelected(product_id) {
+      var array = selectedProducts.filter((item) => item.product_id == product_id)
+
+      return array.length > 0
+    }
+
+    function setNoItemLabels() {
+      var label = $('#categories_selected').find('.no-item-label');
+
+      if(selectedCategories.length == 0){
+        label.show();
+      }else{
+        label.hide();
+      }
+
+      label = $('#products_selected').find('.no-item-label');
+      if(selectedProducts.length == 0){
+        label.show();
+      }else{
+        label.hide();
+      }
+    }
+
+    function setCounts() {
+      $('.total_selected_products').text(selectedProducts.length);
+
+      if(selectedProducts.length > 0){
+        $('.submit-block').find('button').attr('disabled', false);
+        return;
+      }
+      
+      $('.submit-block').find('button').attr('disabled', true);
+    }
+
+    $('form').on('submit', function(){
+      var values = $("input[name='products[]']").map(function(){
+        return parseInt($(this).val());
+      }).get();
+
+      var errors = [];
+      
+      if(values.length == 0){
+        errors.push('{{ help_products }}');
+      }
+      
+      if($("input[name='price_change']:checked").val() == 1){
+        if($("input[name='price_change_value']").val() < 1){
+          errors.push('{{ help_price_change_value }}');
+        }
+
+        if($("input[name='price_change_round_off']:checked").val() != 3){
+          if($("input[name='price_change_round_off_value']").val() != 10){
+            errors.push('{{ help_price_change_round_off_value }}');
+          }
+        }
+      }
+
+      if(errors.length > 0){
+        alert(errors[0]);
+        return false;
+      }
+
+      return true;
+    })
+</script>
+{{ footer }}

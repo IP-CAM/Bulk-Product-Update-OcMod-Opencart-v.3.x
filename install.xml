@@ -1,164 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <modification>
     <name>Bulk Product Update</name>
-    <version>0.0.1</version>
-    <author>Sahil Bhatia</author>
+    <version>0.1.0</version>
+    <author>Webiggle</author>
     <link>https://www.webiggle.com</link>
     <code>bulk_product_update</code>
-    <description>Bulk product update</description>
-    <file path="admin/view/template/catalog/product_list.twig">
-        <operation>
-            <search><![CDATA[ <div id="filter-product" class="col-md-3 col-md-push-9 col-sm-12 hidden-sm hidden-xs"> ]]></search>
-            <add position="replace"><![CDATA[
-                <div class="col-md-3 col-md-push-9 col-sm-12 hidden-sm hidden-xs"> <div id="filter-product">
-            ]]></add>
-        </operation>
-    </file>
-    <file path="admin/view/template/catalog/product_list.twig">
-        <operation>
-            <search><![CDATA[ $('#button-filter').on('click', function() { ]]></search>
-            <add position="before"><![CDATA[
-            $('#button-bulk-update').on('click', function(){
-                var button = $(this);
-                var products = $('input[name=\'selected[]\']:checked').map(function(){
-                    return $(this).val();
-                });
-                var price = $('input[name=\'price\']').val();
-                var product_special = $('input[name=\'product_special\']').val();
-                if (price!='' && product_special!='' && products.length!=0) {
-                    $.ajax({
-                    url: 'index.php?route=catalog/product/bulkProductUpdate&user_token={{ user_token }}',
-                    data:{
-                    "type":"price",
-                    "price":price,
-                    "product_special":product_special,
-                    "products": products.get(),
-                    },
-                    beforeSend: function(){
-                        button.html('<i class="fa fa-circle-o-notch fa-spin"></i>');
-                        button.attr('disabled','disabled');
-                        button.addClass('loading');
-                    },
-                    success: function(json) {
-                        button.removeClass('loading').removeAttr('disabled','disabled').html(button.data('text'));
-                        window.location.reload();
-                    },
-                    error: function(xhr) { // if error occured
-                    alert("Error occured. Please try again.");
-                    },
-                });
-                }else{
-                alert('Please enter "Price", "Special Price" & Select Products first!')
-                }
-            });
-            ]]></add>
-        </operation>
-    </file>
-    <file path="admin/view/template/catalog/product_list.twig">
-        <operation>
-            <search><![CDATA[ <div class="col-md-9 col-md-pull-3 col-sm-12"> ]]></search>
-            <add position="before"><![CDATA[
-                    <div id="bulk-product-update">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                            <h3 class="panel-title"><i class="fa fa-gear"></i> {{ text_module_bulk_price_title }}</h3>
-                            </div>
-                            <div class="panel-body">
-                            <div class="form-group">
-                                <label class="control-label" for="input-name">{{ text_module_bulk_price }}</label>
-                                <input type="text" name="price" value="{{ price }}" placeholder="{{ text_module_bulk_price_placeholder }}" id="input-bulk-price" class="form-control" />
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" for="input-name">{{ text_module_bulk_product_special }}</label>
-                                <input type="text" name="product_special" value="{{ product_special }}" placeholder="{{ text_module_bulk_product_special_placeholder }}" id="input-bulk-product-special" class="form-control" />
-                            </div>
-                            <div class="form-group text-right">
-                                <button type="button" id="button-bulk-update" class="btn btn-primary" data-text="{{ text_module_bulk_action_button }}" data-loading-text="{{ text_module_bulk_price_loading }}">{{ text_module_bulk_action_button }}</button>
-                            </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            ]]></add>
-        </operation>
-    </file>
+    <description>Bulk Product Update</description>
+
     <file path="admin/controller/catalog/product.php">
         <operation>
-            <search><![CDATA[ public function autocomplete() { ]]></search>
+            <search><![CDATA[ $data['add'] = $this->url->link('catalog/product/add', 'user_token=' . $this->session->data['user_token'] . $url, true); ]]></search>
             <add position="before"><![CDATA[
-            public function bulkProductUpdate()
-            {
-                $this->load->language('catalog/product');
-                $this->load->model('catalog/product');
-                $data = [];
-                if(isset($this->request->get['type'])){
-                    $data['type'] = $this->request->get['type'];
-                }else{
-                    $data['type'] = 'price';
-                }
-                
-                if($data['type']=='price'){
-                    if(isset($this->request->get['product_special'])){
-                        $data['product_special'] = $this->request->get['product_special'];
-                    }
-                    if(isset($this->request->get['price'])){
-                        $data['price'] = $this->request->get['price'];
-                    }
-                    $counter = 0;
-                    foreach ($this->request->get['products'] as $product_id) {
-                        $data['product_id'] = $product_id;
-                        $this->model_catalog_product->bulkProductUpdate($data);
-                        $counter++;
-                    }
-                }
-                $this->session->data['success'] = $this->language->get('text_success') . ' (Total Modified: '.$counter.')';
-            }]]></add>
+            // Bulk Product Module start 
+            $data['bulk_product_update_extension_url'] = $this->url->link('extension/module/bulk_product_update', 'user_token=' . $this->session->data['user_token'] . $url, true);
+            ]]></add>
         </operation>
     </file>
-    <file path="admin/model/catalog/product.php">
+    <file path="admin/view/template/catalog/product_list.twig">
         <operation>
-            <search><![CDATA[ public function addProduct($data) { ]]></search>
+            <search><![CDATA[ <a href="{{ add }}" data-toggle="tooltip" ]]></search>
             <add position="before"><![CDATA[
-            public function bulkProductUpdate($data)
-            {
-                if(isset($data['type'])){
-                    if ($data['type']=='price') {
-                        $this->bulkProductUpdatePrice($data);
-                    }
-                }
-            }
-            public function bulkProductUpdatePrice($data)
-            {	
-                //Update Price
-                $sql = "UPDATE " . DB_PREFIX . "product SET ";
-                if (isset($data['price'])) {
-                    $sql .= "price = " . (float)$data['price'];
-                }
-
-                $sql .= ", date_added = NOW(), date_modified = NOW() WHERE product_id = '" . (int)$data['product_id'] . "'";
-
-                $this->db->query($sql);
-                
-                //Update Special Price
-                if (isset($data['product_special'])) {
-                    $this->db->query("DELETE FROM " . DB_PREFIX . "product_special WHERE product_id = '" . (int)$data['product_id'] . "'");
-                    $this->db->query("INSERT INTO " . DB_PREFIX . "product_special SET product_id = '" . (int)$data['product_id'] . "', customer_group_id = 1, priority = 0, price = '" . (float)$data['product_special'] . "', date_start = '0000-00-00', date_end = '0000-00-00'");
-                }
-            }]]></add>
-        </operation>
-    </file>
-    <file path="admin/language/*/catalog/product.php">
-        <operation>
-            <search><![CDATA[ $_['heading_title'] ]]></search>
-            <add position="before"><![CDATA[
-            //Bulk Product Update Module
-                $_['text_module_bulk_price_loading']                    = 'Processing..';
-                $_['text_module_bulk_price_title']                      = 'Bulk Product Update';
-                $_['text_module_bulk_price']                            = 'Price';
-                $_['text_module_bulk_price_placeholder']                = 'Enter Price';
-                $_['text_module_bulk_product_special']                  = 'Special Price';
-                $_['text_module_bulk_product_special_placeholder']      = 'Enter Special Price';
-                $_['text_module_bulk_action_button']                    = 'Update';
+            <a href="{{ bulk_product_update_extension_url }}" class="btn btn-success"><i class="fa fa-gear"></i>&nbsp;Bulk Product Update</a> 
             ]]></add>
         </operation>
     </file>

@@ -7,4 +7,8 @@
 4. Go to > Extensions > Modifications
 5. Click refresh button at top right to created fresh modification cache.
 
+## How to use it
+1. Go to > Catalog > Product
+2. Click "Bulk Product Update" button from top right
+
 #### !! Installed Complete !!
