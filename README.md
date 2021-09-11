@@ -12,3 +12,7 @@
 2. Click "Bulk Product Update" button from top right
 
 #### !! Installed Complete !!
+
+For Support & Customizations
+Email us at: info@webiggle.com
+Website: webiggle.com
