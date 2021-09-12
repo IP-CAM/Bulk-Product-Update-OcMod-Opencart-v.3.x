@@ -11,7 +11,7 @@
 1. Go to > Catalog > Product
 2. Click "Bulk Product Update" button from top right
 
-#### !! Installed Complete !!
+#### !!  Installed Complete  !!
 
 For Support & Customizations
 Email us at: info@webiggle.com
